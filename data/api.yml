@@ -1,18 +1,17 @@
 openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/RYALANE2/timesheet/1.0.0
 info:
-  title: Timesheet API
   description: Initial version of the Timesheet API
+  version: "1.0.0"
+  title: Timesheet API
   contact:
     email: ryan.bowes@mgisinc.ca
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
-servers:
-  - url: https://virtserver.swaggerhub.com/RYALANE2/timesheet/1.0.0
-    description: SwaggerHub API Auto Mocking
-security:
-  - bearerAuth: []
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
   - name: days
   - name: timesheets
@@ -24,16 +23,15 @@ paths:
   /day:
     summary: Represents a user
     description: >
-      This resource represents an individual day in the system. Each day is
-      identified by the submitter, the submission destination, and the date.
+      This resource represents an individual day in the system.
+      Each day is identified by the submitter, the submission destination, and the date.
     get:
       tags:
         - days
       summary: retrieves days for the given userID
-      description: >
-        By reading the sub within the JWT token, a users days can be securely
-        retrieved
       operationId: getDays
+      description: |
+        By reading the sub within the JWT token, a users days can be securely retrieved
       responses:
         '200':
           description: array of days for the matching userID
@@ -44,21 +42,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/DayItem'
         '401':
-          description: Authentication information is missing or invalid
-          headers:
-            WWW_Authenticate:
-              style: simple
-              explode: false
-              schema:
-                type: string
+          $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - days
       summary: creates a day for the given userID
-      description: >
-        By reading the sub within the JWT token, create a day in their user
-        partition
       operationId: createDay
+      description: |
+        By reading the sub within the JWT token, create a day in their user partition
       requestBody:
         description: Day item to add
         content:
@@ -67,23 +58,77 @@ paths:
               $ref: '#/components/schemas/DayItem'
       responses:
         '201':
-          description: day created
-        '401':
-          description: Authentication information is missing or invalid
-          headers:
-            WWW_Authenticate:
-              style: simple
-              explode: false
+          description: 'day created'
+          content:
+            text/plain:
               schema:
                 type: string
+                example: Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /day/{dayId}:
+    put:
+      tags:
+        - days
+      summary: updates a day for the given userID
+      operationId: updateDay
+      description: |
+        By reading the sub within the JWT token, update a day in their user partition
+      parameters:
+        - in: path
+          name: dayId
+          required: true
+          schema:
+            type: string
+          description: the day ID
+      requestBody:
+        description: Day item to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DayItem'
+      responses:
+        '204':
+          description: 'day created'
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      tags:
+        - days
+      summary: deletes a day for the given userID
+      operationId: deleteDay
+      description: |
+        By reading the sub within the JWT token, deletes a day from their user partition
+      parameters:
+        - in: path
+          name: dayId
+          required: true
+          schema:
+            type: string
+          description: the day ID
+      responses:
+        '204':
+          description: 'day deleted'
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
   /timesheet:
     get:
       tags:
         - timesheets
       summary: retrieves timesheets for the user
+      operationId: getTimesheets
       description: |
         By reading the sub within the JWT token, get all the users timesheets
-      operationId: getTimesheets
       responses:
         '200':
           description: array of timesheets for the matching userID
@@ -94,30 +139,37 @@ paths:
                 items:
                   $ref: '#/components/schemas/TimesheetItem'
         '401':
-          description: Authentication information is missing or invalid
-          headers:
-            WWW_Authenticate:
-              style: simple
-              explode: false
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - timesheets
+      summary: create a new timesheet for the user
+      operationId: createTimesheet
+      description: |
+        By reading the sub within the JWT token, create a timesheet for the user
+      responses:
+        '201':
+          description: Timesheet successfully created
+          content:
+            text/plain:
               schema:
                 type: string
+                example: Success
   /timesheet/{timesheetId}:
     get:
       tags:
         - timesheets
       summary: retreive the selected timesheet
-      description: |
-        By reading the timesheet Id, get the users timesheet for the given Id
       operationId: getSpecificTimesheet
+      description:  |
+        By reading the timesheet Id, get the users timesheet for the given Id
       parameters:
-        - name: timesheetId
-          in: path
-          description: the timesheet ID
+        - in: path
+          name: timesheetId
           required: true
-          style: simple
-          explode: false
           schema:
             type: string
+          description: the timesheet ID
       responses:
         '200':
           description: timesheet that matches the timesheetID
@@ -125,23 +177,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimesheetItem'
+    put:
+      tags:
+        - timesheets
+      summary: update an existing timesheet for the user
+      operationId: updateTimesheet
+      description: |
+        By reading the sub within the JWT token and the timesheetId, update a timesheet for the user
+      parameters:
+        - in: path
+          name: timesheetId
+          required: true
+          schema:
+            type: string
+          description: the timesheet ID
+      responses:
+        '204':
+          description: The timesheet was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetItem'
+    delete:
+      tags:
+        - timesheets
+      summary: delete an existing timesheet for the user
+      operationId: deleteTimesheet
+      description: |
+        By reading the sub within the JWT token and the timesheetId, delete a timesheet for the user
+      parameters:
+        - in: path
+          name: timesheetId
+          required: true
+          schema:
+            type: string
+          description: the timesheet ID
+      responses:
+        '204':
+          description: Timesheet successfully deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
   /timesheet/{timesheetId}/days:
     get:
       tags:
         - timesheets
       summary: retrieves the days related to the timesheetId
+      operationId: getTimesheetDays
       description: |
         By reading the timesheet ID, get all of the days associated with it
-      operationId: getTimesheetDays
       parameters:
-        - name: timesheetId
-          in: path
-          description: the timesheet ID
+        - in: path
+          name: timesheetId
           required: true
-          style: simple
-          explode: false
           schema:
             type: string
+          description: the timesheet ID
       responses:
         '200':
           description: array of timesheet days
@@ -151,23 +244,99 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimesheetDayItem'
+    post:
+      tags:
+        - timesheets
+      summary: adds an array of days to the timesheet by the given timesheetId
+      operationId: postTimesheetDays
+      description: |
+        By reading the timesheet ID and the body, add the array of days to the timesheet
+      parameters:
+        - in: path
+          name: timesheetId
+          required: true
+          schema:
+            type: string
+          description: the timesheet ID
+      requestBody:
+        description: An array of days to be added to the timesheet
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DayItem'
+      responses:
+        '204':
+          description: Timesheet days were successfully created
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+  /timesheet/{timesheetId}/profiles:
+    get:
+      tags:
+        - timesheets
+      summary: retrieves the profiles related to the timesheetId
+      operationId: getTimesheetProfiles
+      description: |
+        By reading the timesheet ID, get all of the profiles associated with it
+      parameters:
+        - in: path
+          name: timesheetId
+          required: true
+          schema:
+            type: string
+          description: the timesheet ID
+      responses:
+        '200':
+          description: array of user profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileItem'
+  /timesheet/{timesheetId}/contract:
+    get:
+      tags:
+        - timesheets
+      summary: retrieve the contract for the given timesheet
+      operationId: getTimesheetContract
+      description: |
+        By reading the timesheetId, retrieve the info about the contract
+      parameters:
+        - in: path
+          name: timesheetId
+          required: true
+          schema:
+            type: string
+          description: the timesheet ID
+      responses:
+        '200':
+          description: a contract
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractItem'
+  
   /contract/{contractId}:
     get:
       tags:
         - contracts
       summary: retrieve the contract for the given contractId
+      operationId: getContract
       description: |
         By reading the contractId, retrieve the info about the contract
-      operationId: getContract
       parameters:
-        - name: contractId
-          in: path
-          description: the contract ID
+        - in: path
+          name: contractId
           required: true
-          style: simple
-          explode: false
           schema:
             type: string
+          description: the contract ID
       responses:
         '200':
           description: a contract
@@ -180,19 +349,16 @@ paths:
       tags:
         - contracts
       summary: retrieve the tasks for the given contractId
-      description: >
-        By reading the contractId, retrieve all tasks associated with the
-        contract
       operationId: getTasks
+      description: |
+        By reading the contractId, retrieve all tasks associated with the contract
       parameters:
-        - name: contractId
-          in: path
-          description: the contract ID
+        - in: path
+          name: contractId
           required: true
-          style: simple
-          explode: false
           schema:
             type: string
+          description: the contract ID
       responses:
         '200':
           description: array of tasks (groups)
@@ -202,14 +368,132 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TaskItem'
-  /profile:
+  /contract/{contractId}/profiles:
+    get:
+      tags:
+        - contracts
+      summary: retrieve the profiles associated with the given contractId
+      operationId: getContractProfiles
+      description: |
+        By reading the contractId, retrieve all profiles associated with the contract
+      parameters:
+        - in: path
+          name: contractId
+          required: true
+          schema:
+            type: string
+          description: the contract ID
+      responses:
+        '200':
+          description: array of user profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileItem'
+  /contract/{contractId}/timesheets:
+    get:
+      tags:
+        - contracts
+      summary: retrieve the timesheets associated with the given contractId
+      operationId: getContractTimesheets
+      description: |
+        By reading the contractId, retrieve all timesheets associated with the contract
+      parameters:
+        - in: path
+          name: contractId
+          required: true
+          schema:
+            type: string
+          description: the contract ID
+      responses:
+        '200':
+          description: array of user timesheets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimesheetItem'
+  /contract/{contractId}/org:
+    get:
+      tags:
+        - contracts
+      summary: retrieve the org associated with the given contractId
+      operationId: getContractOrg
+      description: |
+        By reading the contractId, retrieve the org associated with the contract
+      parameters:
+        - in: path
+          name: contractId
+          required: true
+          schema:
+            type: string
+          description: the contract ID
+      responses:
+        '200':
+          description: the org profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgItem'
+  /user:
+    get:
+      tags:
+        - users
+      summary: retrieves the user details of the given user
+      operationId: getUser
+      description: |
+        By reading the sub within the JWT token, get all the users info
+      responses:
+        '200':
+          description: A user details object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /user/{userId}:
+    get:
+      tags:
+        - users
+      summary: retrieves the user details of the given user
+      operationId: getUserById
+      description: |
+        By reading the userId, get all the users info
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: the user ID
+      responses:
+        '200':
+          description: A user details object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /user/{userId}/profile:
     get:
       tags:
         - users
       summary: retrieves profiles for the user
+      operationId: getProfiles
       description: |
         By reading the sub within the JWT token, get all the users profiles
-      operationId: getProfiles
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: the user ID
       responses:
         '200':
           description: array of profiles for the matching userID
@@ -220,97 +504,22 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProfileItem'
         '401':
-          description: Authentication information is missing or invalid
-          headers:
-            WWW_Authenticate:
-              style: simple
-              explode: false
-              schema:
-                type: string
-  /profile/{contractId}:
-    get:
-      tags:
-        - users
-      summary: retrieves the profiles for the given contract ID
-      description: |
-        By reading the contract ID, retrieve all profiles
-      operationId: getContractProfiles
-      parameters:
-        - name: contractId
-          in: path
-          description: the contract ID
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: An array of profile objects
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProfileItem'
-  /user:
-    get:
-      tags:
-        - users
-      summary: retrieves the user details of the given user
-      description: |
-        By reading the sub within the JWT token, get all the users info
-      operationId: getUser
-      responses:
-        '200':
-          description: A user details object
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserItem'
-        '401':
-          description: Authentication information is missing or invalid
-          headers:
-            WWW_Authenticate:
-              style: simple
-              explode: false
-              schema:
-                type: string
-  /user/contracts:
-    get:
-      tags:
-        - users
-      summary: retrieves the contracts and tasks associated with the user
-      description: >
-        By reading the sub within the JWT token, get the users contracts and
-        tasks
-      operationId: getUserContracts
-      responses:
-        '200':
-          description: An array of contracts and tasks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ContractItem'
+          $ref: '#/components/responses/UnauthorizedError'
   /user/{userId}/contracts:
     get:
       tags:
         - users
       summary: retrieves the contracts and tasks associated with the user
+      operationId: getSelectedUserContracts
       description: |
         By reading the userId, get the users contracts and tasks
-      operationId: getSelectedUserContracts
       parameters:
-        - name: userId
-          in: path
-          description: the user ID
+        - in: path
+          name: userId
           required: true
-          style: simple
-          explode: false
           schema:
             type: string
+          description: the user ID
       responses:
         '200':
           description: An array of contracts and tasks
@@ -320,15 +529,62 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ContractItem'
+  /user/{userId}/timesheets:
+    get:
+      tags:
+        - users
+      summary: retrieves the timesheets associated with the user
+      operationId: getSelectedUserTimesheets
+      description: |
+        By reading the userId, get the users timesheets
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: the user ID
+      responses:
+        '200':
+          description: An array of timesheets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimesheetItem'
+  /user/{userId}/days:
+    get:
+      tags:
+        - users
+      summary: retrieves the days associated with the user
+      operationId: getSelectedUserDays
+      description: |
+        By reading the userId, get the users days
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: the user ID
+      responses:
+        '200':
+          description: An array of days
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DayItem'
   /org:
     get:
       tags:
         - orgs
       summary: retrieves the details for the org
-      description: >
-        By reading the sub within the JWT token, get all the users orgs it
-        created/belongs to
       operationId: getOrg
+      description: |
+        By reading the sub within the JWT token, get all the users orgs it created/belongs to
       responses:
         '200':
           description: An array of org details
@@ -339,28 +595,72 @@ paths:
                 items:
                   $ref: '#/components/schemas/OrgItem'
         '401':
-          description: Authentication information is missing or invalid
-          headers:
-            WWW_Authenticate:
-              style: simple
-              explode: false
+          $ref: '#/components/responses/UnauthorizedError'
+  /org/{orgId}:
+    get:
+      tags:
+        - orgs
+      summary: retrieves the details for the org
+      operationId: getOrgById
+      description: |
+        By reading the sub within the JWT token, get all the users orgs it created/belongs to
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: string
+          description: the org ID
+      responses:
+        '200':
+          description: The org details
+          content:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/OrgItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /org/{orgId}/contracts:
+    get:
+      tags:
+        - orgs
+      summary: retrieves the contracts that belong to the org
+      operationId: getOrgContractsById
+      description: |
+        By reading the orgId, get all the contracts it created
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: string
+          description: the org ID
+      responses:
+        '200':
+          description: An array of contracts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 components:
   schemas:
     TimesheetDayItem:
+      type: object
       required:
-        - Date
         - PK
         - SK
-      type: object
+        - Date
       properties:
         PK:
           type: string
-          example: USER#123
+          example: 'USER#123'
         SK:
           type: string
-          example: TIK_TIMESHEETS#DAYS_123456_2022-08-15
+          example: 'TIK_TIMESHEETS#DAYS_123456_2022-08-15'
         Date:
           type: string
           format: date
@@ -378,21 +678,21 @@ components:
           type: boolean
           example: false
     TimesheetItem:
+      type: object
       required:
         - PK
         - SK
-        - endDate
         - startDate
+        - endDate
         - status
         - timesheetId
-      type: object
       properties:
         PK:
           type: string
-          example: USER#123
+          example: 'USER#123'
         SK:
           type: string
-          example: TIK_TIMESHEETS_123456
+          example: 'TIK_TIMESHEETS_123456'
         startDate:
           type: string
           format: date
@@ -403,7 +703,7 @@ components:
           example: '2022-08-22'
         status:
           type: string
-          example: unapproved
+          example: 'unapproved'
         timesheetId:
           type: string
           example: '123456'
@@ -412,15 +712,15 @@ components:
       properties:
         name:
           type: string
-          example: test
+          example: 'test'
     TaskItem:
-      required:
-        - Details
-        - OrgId
-        - PK
-        - ParentId
-        - SK
       type: object
+      required:
+        - PK
+        - SK
+        - OrgId
+        - ParentId
+        - Details
       properties:
         PK:
           type: string
@@ -433,12 +733,12 @@ components:
         Details:
           $ref: '#/components/schemas/GroupDetails'
     ContractItem:
+      type: object
       required:
-        - Details
-        - OrgId
         - PK
         - SK
-      type: object
+        - OrgId
+        - Details
       properties:
         PK:
           type: string
@@ -453,19 +753,19 @@ components:
         Details:
           $ref: '#/components/schemas/GroupDetails'
     OrgItem:
-      required:
-        - OrgId
-        - Owner
+      type: object
+      required: 
         - PK
         - SK
-      type: object
+        - OrgId
+        - Owner
       properties:
         PK:
           type: string
-          example: ORG#789
+          example: 'ORG#789'
         SK:
           type: string
-          example: TIK_ORG_789
+          example: 'TIK_ORG_789'
         OrgId:
           type: string
           example: '789'
@@ -473,69 +773,69 @@ components:
           type: string
           example: '123'
     ProfileItem:
-      required:
-        - OrgId
+      type: object
+      required: 
         - PK
         - SK
-      type: object
+        - OrgId
       properties:
         PK:
           type: string
-          example: USER#123
+          example: 'USER#123'
         SK:
           type: string
-          example: TIK_PROFILE_456#1
+          example: 'TIK_PROFILE_456#1'
         OrgId:
           type: string
           example: '789'
         GroupId:
           type: string
-          example: 456#1
+          example: '456#1'
     UserItem:
+      type: object
       required:
         - PK
         - SK
         - email
-      type: object
       properties:
         PK:
           type: string
-          example: USER#123
+          example: 'USER#123'
         SK:
           type: string
-          example: TIK_USER
+          example: 'TIK_USER'
         email:
           type: string
           format: email
-          example: ryan.bowes@mgisinc.ca
+          example: 'ryan.bowes@mgisinc.ca'
     DayItem:
+      type: object
       required:
-        - Date
         - PK
         - SK
-      type: object
+        - Date
       properties:
         PK:
           type: string
-          example: USER#123
+          example: 'USER#123'
         SK:
           type: string
-          example: TIK_DAYS_456#123_2022-01-30
+          example: 'TIK_DAYS_456#123_2022-01-30'
         Date:
           type: string
           format: date
           example: '2022-08-15'
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
   responses:
     UnauthorizedError:
       description: Authentication information is missing or invalid
       headers:
         WWW_Authenticate:
-          style: simple
-          explode: false
           schema:
             type: string
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+security:
+  - bearerAuth: []
