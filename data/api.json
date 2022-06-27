@@ -1,0 +1,779 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Timesheet API",
+    "description": "Initial version of the Timesheet API",
+    "contact": {
+      "email": "ryan.bowes@mgisinc.ca"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://virtserver.swaggerhub.com/RYALANE2/timesheet/1.0.0",
+      "description": "SwaggerHub API Auto Mocking"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "days"
+    },
+    {
+      "name": "timesheets"
+    },
+    {
+      "name": "contracts"
+    },
+    {
+      "name": "users"
+    },
+    {
+      "name": "orgs",
+      "description": "Operations available to org owners"
+    }
+  ],
+  "paths": {
+    "/day": {
+      "summary": "Represents a user",
+      "description": "This resource represents an individual day in the system. Each day is identified by the submitter, the submission destination, and the date.\n",
+      "get": {
+        "tags": [
+          "days"
+        ],
+        "summary": "retrieves days for the given userID",
+        "description": "By reading the sub within the JWT token, a users days can be securely retrieved\n",
+        "operationId": "getDays",
+        "responses": {
+          "200": {
+            "description": "array of days for the matching userID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DayItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication information is missing or invalid",
+            "headers": {
+              "WWW_Authenticate": {
+                "style": "simple",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "days"
+        ],
+        "summary": "creates a day for the given userID",
+        "description": "By reading the sub within the JWT token, create a day in their user partition\n",
+        "operationId": "createDay",
+        "requestBody": {
+          "description": "Day item to add",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DayItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "day created"
+          },
+          "401": {
+            "description": "Authentication information is missing or invalid",
+            "headers": {
+              "WWW_Authenticate": {
+                "style": "simple",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/timesheet": {
+      "get": {
+        "tags": [
+          "timesheets"
+        ],
+        "summary": "retrieves timesheets for the user",
+        "description": "By reading the sub within the JWT token, get all the users timesheets\n",
+        "operationId": "getTimesheets",
+        "responses": {
+          "200": {
+            "description": "array of timesheets for the matching userID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication information is missing or invalid",
+            "headers": {
+              "WWW_Authenticate": {
+                "style": "simple",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/timesheet/{timesheetId}": {
+      "get": {
+        "tags": [
+          "timesheets"
+        ],
+        "summary": "retreive the selected timesheet",
+        "description": "By reading the timesheet Id, get the users timesheet for the given Id\n",
+        "operationId": "getSpecificTimesheet",
+        "parameters": [
+          {
+            "name": "timesheetId",
+            "in": "path",
+            "description": "the timesheet ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "timesheet that matches the timesheetID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/timesheet/{timesheetId}/days": {
+      "get": {
+        "tags": [
+          "timesheets"
+        ],
+        "summary": "retrieves the days related to the timesheetId",
+        "description": "By reading the timesheet ID, get all of the days associated with it\n",
+        "operationId": "getTimesheetDays",
+        "parameters": [
+          {
+            "name": "timesheetId",
+            "in": "path",
+            "description": "the timesheet ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "array of timesheet days",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetDayItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contract/{contractId}": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "retrieve the contract for the given contractId",
+        "description": "By reading the contractId, retrieve the info about the contract\n",
+        "operationId": "getContract",
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "the contract ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "a contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contract/{contractId}/tasks": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "summary": "retrieve the tasks for the given contractId",
+        "description": "By reading the contractId, retrieve all tasks associated with the contract\n",
+        "operationId": "getTasks",
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "the contract ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "array of tasks (groups)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "retrieves profiles for the user",
+        "description": "By reading the sub within the JWT token, get all the users profiles\n",
+        "operationId": "getProfiles",
+        "responses": {
+          "200": {
+            "description": "array of profiles for the matching userID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProfileItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication information is missing or invalid",
+            "headers": {
+              "WWW_Authenticate": {
+                "style": "simple",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile/{contractId}": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "retrieves the profiles for the given contract ID",
+        "description": "By reading the contract ID, retrieve all profiles\n",
+        "operationId": "getContractProfiles",
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "path",
+            "description": "the contract ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of profile objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProfileItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "retrieves the user details of the given user",
+        "description": "By reading the sub within the JWT token, get all the users info\n",
+        "operationId": "getUser",
+        "responses": {
+          "200": {
+            "description": "A user details object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication information is missing or invalid",
+            "headers": {
+              "WWW_Authenticate": {
+                "style": "simple",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/contracts": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "retrieves the contracts and tasks associated with the user",
+        "description": "By reading the sub within the JWT token, get the users contracts and tasks\n",
+        "operationId": "getUserContracts",
+        "responses": {
+          "200": {
+            "description": "An array of contracts and tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{userId}/contracts": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "retrieves the contracts and tasks associated with the user",
+        "description": "By reading the userId, get the users contracts and tasks\n",
+        "operationId": "getSelectedUserContracts",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "the user ID",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of contracts and tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/org": {
+      "get": {
+        "tags": [
+          "orgs"
+        ],
+        "summary": "retrieves the details for the org",
+        "description": "By reading the sub within the JWT token, get all the users orgs it created/belongs to\n",
+        "operationId": "getOrg",
+        "responses": {
+          "200": {
+            "description": "An array of org details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication information is missing or invalid",
+            "headers": {
+              "WWW_Authenticate": {
+                "style": "simple",
+                "explode": false,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TimesheetDayItem": {
+        "required": [
+          "Date",
+          "PK",
+          "SK"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string",
+            "example": "USER#123"
+          },
+          "SK": {
+            "type": "string",
+            "example": "TIK_TIMESHEETS#DAYS_123456_2022-08-15"
+          },
+          "Date": {
+            "type": "string",
+            "format": "date",
+            "example": "2022-08-15"
+          },
+          "hours": {
+            "type": "number",
+            "example": 7.5
+          },
+          "isSick": {
+            "type": "boolean",
+            "example": false
+          },
+          "isVacation": {
+            "type": "boolean",
+            "example": false
+          },
+          "isHoliday": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "TimesheetItem": {
+        "required": [
+          "PK",
+          "SK",
+          "endDate",
+          "startDate",
+          "status",
+          "timesheetId"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string",
+            "example": "USER#123"
+          },
+          "SK": {
+            "type": "string",
+            "example": "TIK_TIMESHEETS_123456"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2022-08-15"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2022-08-22"
+          },
+          "status": {
+            "type": "string",
+            "example": "unapproved"
+          },
+          "timesheetId": {
+            "type": "string",
+            "example": "123456"
+          }
+        }
+      },
+      "GroupDetails": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "test"
+          }
+        }
+      },
+      "TaskItem": {
+        "required": [
+          "Details",
+          "OrgId",
+          "PK",
+          "ParentId",
+          "SK"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string"
+          },
+          "SK": {
+            "type": "string"
+          },
+          "OrgId": {
+            "type": "string"
+          },
+          "ParentId": {
+            "type": "string"
+          },
+          "Details": {
+            "$ref": "#/components/schemas/GroupDetails"
+          }
+        }
+      },
+      "ContractItem": {
+        "required": [
+          "Details",
+          "OrgId",
+          "PK",
+          "SK"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string"
+          },
+          "SK": {
+            "type": "string"
+          },
+          "OrgId": {
+            "type": "string"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskItem"
+            }
+          },
+          "Details": {
+            "$ref": "#/components/schemas/GroupDetails"
+          }
+        }
+      },
+      "OrgItem": {
+        "required": [
+          "OrgId",
+          "Owner",
+          "PK",
+          "SK"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string",
+            "example": "ORG#789"
+          },
+          "SK": {
+            "type": "string",
+            "example": "TIK_ORG_789"
+          },
+          "OrgId": {
+            "type": "string",
+            "example": "789"
+          },
+          "Owner": {
+            "type": "string",
+            "example": "123"
+          }
+        }
+      },
+      "ProfileItem": {
+        "required": [
+          "OrgId",
+          "PK",
+          "SK"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string",
+            "example": "USER#123"
+          },
+          "SK": {
+            "type": "string",
+            "example": "TIK_PROFILE_456#1"
+          },
+          "OrgId": {
+            "type": "string",
+            "example": "789"
+          },
+          "GroupId": {
+            "type": "string",
+            "example": "456#1"
+          }
+        }
+      },
+      "UserItem": {
+        "required": [
+          "PK",
+          "SK",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string",
+            "example": "USER#123"
+          },
+          "SK": {
+            "type": "string",
+            "example": "TIK_USER"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "ryan.bowes@mgisinc.ca"
+          }
+        }
+      },
+      "DayItem": {
+        "required": [
+          "Date",
+          "PK",
+          "SK"
+        ],
+        "type": "object",
+        "properties": {
+          "PK": {
+            "type": "string",
+            "example": "USER#123"
+          },
+          "SK": {
+            "type": "string",
+            "example": "TIK_DAYS_456#123_2022-01-30"
+          },
+          "Date": {
+            "type": "string",
+            "format": "date",
+            "example": "2022-08-15"
+          }
+        }
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Authentication information is missing or invalid",
+        "headers": {
+          "WWW_Authenticate": {
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "80:8080"
+    volumes:
+      - ./data:/swagger-data
+    environment:
+      SWAGGER_FILE: /swagger-data/api.yml
