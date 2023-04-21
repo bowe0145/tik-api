@@ -18,9 +18,8 @@ tags:
   - name: contracts
   - name: users
   - name: orgs
-    description: Operations available to org owners
 paths:
-  /day:
+  /days:
     summary: Represents a user
     description: >
       This resource represents an individual day in the system.
@@ -66,7 +65,7 @@ paths:
                 example: Success
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /day/{dayId}:
+  /days/{dayId}:
     put:
       tags:
         - days
@@ -75,12 +74,7 @@ paths:
       description: |
         By reading the sub within the JWT token, update a day in their user partition
       parameters:
-        - in: path
-          name: dayId
-          required: true
-          schema:
-            type: string
-          description: the day ID
+        - $ref: '#/components/parameters/dayId'
       requestBody:
         description: Day item to update
         content:
@@ -95,6 +89,8 @@ paths:
               schema:
                 type: string
                 example: Success
+        '404':
+          $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     delete:
@@ -105,12 +101,7 @@ paths:
       description: |
         By reading the sub within the JWT token, deletes a day from their user partition
       parameters:
-        - in: path
-          name: dayId
-          required: true
-          schema:
-            type: string
-          description: the day ID
+        - $ref: '#/components/parameters/dayId'
       responses:
         '204':
           description: 'day deleted'
@@ -121,7 +112,9 @@ paths:
                 example: Success
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /timesheet:
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /timesheets:
     get:
       tags:
         - timesheets
@@ -155,7 +148,9 @@ paths:
               schema:
                 type: string
                 example: Success
-  /timesheet/{timesheetId}:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /timesheets/{timesheetId}:
     get:
       tags:
         - timesheets
@@ -164,12 +159,7 @@ paths:
       description:  |
         By reading the timesheet Id, get the users timesheet for the given Id
       parameters:
-        - in: path
-          name: timesheetId
-          required: true
-          schema:
-            type: string
-          description: the timesheet ID
+        - $ref: '#/components/parameters/timesheetId'
       responses:
         '200':
           description: timesheet that matches the timesheetID
@@ -177,6 +167,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimesheetItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - timesheets
@@ -185,12 +179,7 @@ paths:
       description: |
         By reading the sub within the JWT token and the timesheetId, update a timesheet for the user
       parameters:
-        - in: path
-          name: timesheetId
-          required: true
-          schema:
-            type: string
-          description: the timesheet ID
+        - $ref: '#/components/parameters/timesheetId'
       responses:
         '204':
           description: The timesheet was successfully updated
@@ -198,6 +187,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimesheetItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
         - timesheets
@@ -206,12 +199,7 @@ paths:
       description: |
         By reading the sub within the JWT token and the timesheetId, delete a timesheet for the user
       parameters:
-        - in: path
-          name: timesheetId
-          required: true
-          schema:
-            type: string
-          description: the timesheet ID
+        - $ref: '#/components/parameters/timesheetId'
       responses:
         '204':
           description: Timesheet successfully deleted
@@ -220,7 +208,11 @@ paths:
               schema:
                 type: string
                 example: Success
-  /timesheet/{timesheetId}/days:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /timesheets/{timesheetId}/days:
     get:
       tags:
         - timesheets
@@ -229,12 +221,7 @@ paths:
       description: |
         By reading the timesheet ID, get all of the days associated with it
       parameters:
-        - in: path
-          name: timesheetId
-          required: true
-          schema:
-            type: string
-          description: the timesheet ID
+        - $ref: '#/components/parameters/timesheetId'
       responses:
         '200':
           description: array of timesheet days
@@ -244,6 +231,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimesheetDayItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - timesheets
@@ -252,12 +243,7 @@ paths:
       description: |
         By reading the timesheet ID and the body, add the array of days to the timesheet
       parameters:
-        - in: path
-          name: timesheetId
-          required: true
-          schema:
-            type: string
-          description: the timesheet ID
+        - $ref: '#/components/parameters/timesheetId'
       requestBody:
         description: An array of days to be added to the timesheet
         required: true
@@ -275,7 +261,11 @@ paths:
               schema:
                 type: string
                 example: Success
-  /timesheet/{timesheetId}/profiles:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /timesheets/{timesheetId}/profiles:
     get:
       tags:
         - timesheets
@@ -284,12 +274,7 @@ paths:
       description: |
         By reading the timesheet ID, get all of the profiles associated with it
       parameters:
-        - in: path
-          name: timesheetId
-          required: true
-          schema:
-            type: string
-          description: the timesheet ID
+        - $ref: '#/components/parameters/timesheetId'
       responses:
         '200':
           description: array of user profiles
@@ -299,21 +284,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProfileItem'
-  /timesheet/{timesheetId}/contract:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /timesheets/{timesheetId}/parent:
     get:
       tags:
         - timesheets
-      summary: retrieve the contract for the given timesheet
+      summary: retrieve the contract/task that the timesheet is being submitted to
       operationId: getTimesheetContract
       description: |
-        By reading the timesheetId, retrieve the info about the contract
+        By reading the timesheetId, retrieve the info about the contract/task
       parameters:
-        - in: path
-          name: timesheetId
-          required: true
-          schema:
-            type: string
-          description: the timesheet ID
+        - $ref: '#/components/parameters/timesheetId'
       responses:
         '200':
           description: a contract
@@ -321,8 +303,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContractItem'
-  
-  /contract/{contractId}:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /contracts/{contractId}:
     get:
       tags:
         - contracts
@@ -331,12 +314,7 @@ paths:
       description: |
         By reading the contractId, retrieve the info about the contract
       parameters:
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
-          description: the contract ID
+        - $ref: '#/components/parameters/contractId'
       responses:
         '200':
           description: a contract
@@ -344,21 +322,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContractItem'
-  /contract/{contractId}/tasks:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /contracts/{contractId}/tasks:
     get:
       tags:
         - contracts
       summary: retrieve the tasks for the given contractId
-      operationId: getTasks
+      operationId: getContractTasks
       description: |
         By reading the contractId, retrieve all tasks associated with the contract
       parameters:
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
-          description: the contract ID
+        - $ref: '#/components/parameters/contractId'
       responses:
         '200':
           description: array of tasks (groups)
@@ -368,7 +345,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TaskItem'
-  /contract/{contractId}/profiles:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - contracts
+      summary: create a new task for the given contractId
+      operationId: createContractTask
+      description: |
+        By reading the contractId, create a child task with the provided information
+      parameters:
+        - $ref: '#/components/parameters/contractId'
+      responses:
+        '204':
+          description: task successfully created
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /contracts/{contractId}/profiles:
     get:
       tags:
         - contracts
@@ -377,12 +375,7 @@ paths:
       description: |
         By reading the contractId, retrieve all profiles associated with the contract
       parameters:
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
-          description: the contract ID
+        - $ref: '#/components/parameters/contractId'
       responses:
         '200':
           description: array of user profiles
@@ -392,7 +385,30 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProfileItem'
-  /contract/{contractId}/timesheets:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /contracts/{contractId}/days:
+    get:
+      tags:
+        - contracts
+      summary: retrieve the days associated with the given contractId
+      operationId: getContractDays
+      description: |
+        By reading the contractId, retrieve all days associated with the contract
+      parameters:
+        - $ref: '#/components/parameters/contractId'
+      responses:
+        '200':
+          description: array of user days
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DayItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /contracts/{contractId}/timesheets:
     get:
       tags:
         - contracts
@@ -401,12 +417,7 @@ paths:
       description: |
         By reading the contractId, retrieve all timesheets associated with the contract
       parameters:
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
-          description: the contract ID
+        - $ref: '#/components/parameters/contractId'
       responses:
         '200':
           description: array of user timesheets
@@ -416,7 +427,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimesheetItem'
-  /contract/{contractId}/org:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /contracts/{contractId}/parent:
+    get:
+      tags: 
+        - contracts
+      summary: retrieve the parent contract if possible (for tasks)
+      operationId: getContractParent
+      description: |
+        By reading the body of the contract object, retrieve the parent if applicable
+      parameters:
+        - $ref: '#/components/parameters/contractId'
+      responses:
+        '200':
+          description: a contract
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /contracts/{contractId}/org:
     get:
       tags:
         - contracts
@@ -425,12 +457,7 @@ paths:
       description: |
         By reading the contractId, retrieve the org associated with the contract
       parameters:
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
-          description: the contract ID
+        - $ref: '#/components/parameters/contractId'
       responses:
         '200':
           description: the org profile
@@ -438,7 +465,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrgItem'
-  /user:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /users:
     get:
       tags:
         - users
@@ -455,7 +484,7 @@ paths:
                 $ref: '#/components/schemas/UserItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /user/{userId}:
+  /users/{userId}:
     get:
       tags:
         - users
@@ -464,12 +493,7 @@ paths:
       description: |
         By reading the userId, get all the users info
       parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: string
-          description: the user ID
+        - $ref: '#/components/parameters/userId'
       responses:
         '200':
           description: A user details object
@@ -479,7 +503,55 @@ paths:
                 $ref: '#/components/schemas/UserItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /user/{userId}/profile:
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /users/{userId}/info:
+    get:
+      deprecated: true
+      tags:
+        - users
+      summary: retrieves the user details of the given user
+      operationId: getUserInfo
+      description: |
+        By reading the userId, get all the users info
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: A user info object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      deprecated: true
+      tags:
+        - users
+      summary: creates an info object that is defined in the request body
+      operationId: createUserInfo
+      description: |
+        By reading the userId, create a new info object
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        description: Info item to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfoItem'
+      responses:
+        '201':
+          description: 'info updated'
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /users/{userId}/profiles:
     get:
       tags:
         - users
@@ -488,12 +560,7 @@ paths:
       description: |
         By reading the sub within the JWT token, get all the users profiles
       parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: string
-          description: the user ID
+        - $ref: '#/components/parameters/userId'
       responses:
         '200':
           description: array of profiles for the matching userID
@@ -505,7 +572,32 @@ paths:
                   $ref: '#/components/schemas/ProfileItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /user/{userId}/contracts:
+    post:
+      tags:
+        - users
+      summary: creates a contract that is defined in the request body
+      operationId: createUserProfile
+      description: |
+        By reading the userId, create a new profile
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        description: Profile item to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileItem'
+      responses:
+        '201':
+          description: 'contract created'
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /users/{userId}/contracts:
     get:
       tags:
         - users
@@ -514,12 +606,7 @@ paths:
       description: |
         By reading the userId, get the users contracts and tasks
       parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: string
-          description: the user ID
+        - $ref: '#/components/parameters/userId'
       responses:
         '200':
           description: An array of contracts and tasks
@@ -529,7 +616,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ContractItem'
-  /user/{userId}/timesheets:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /users/{userId}/timesheets:
     get:
       tags:
         - users
@@ -538,12 +627,7 @@ paths:
       description: |
         By reading the userId, get the users timesheets
       parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: string
-          description: the user ID
+        - $ref: '#/components/parameters/userId'
       responses:
         '200':
           description: An array of timesheets
@@ -553,7 +637,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimesheetItem'
-  /user/{userId}/days:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /users/{userId}/days:
     get:
       tags:
         - users
@@ -562,12 +648,7 @@ paths:
       description: |
         By reading the userId, get the users days
       parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: string
-          description: the user ID
+         - $ref: '#/components/parameters/userId'
       responses:
         '200':
           description: An array of days
@@ -577,7 +658,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DayItem'
-  /org:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /orgs:
     get:
       tags:
         - orgs
@@ -596,7 +679,7 @@ paths:
                   $ref: '#/components/schemas/OrgItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /org/{orgId}:
+  /orgs/{orgId}:
     get:
       tags:
         - orgs
@@ -605,12 +688,7 @@ paths:
       description: |
         By reading the sub within the JWT token, get all the users orgs it created/belongs to
       parameters:
-        - in: path
-          name: orgId
-          required: true
-          schema:
-            type: string
-          description: the org ID
+        - $ref: '#/components/parameters/orgId'
       responses:
         '200':
           description: The org details
@@ -620,7 +698,9 @@ paths:
                 $ref: '#/components/schemas/OrgItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /org/{orgId}/contracts:
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /orgs/{orgId}/contracts:
     get:
       tags:
         - orgs
@@ -629,12 +709,7 @@ paths:
       description: |
         By reading the orgId, get all the contracts it created
       parameters:
-        - in: path
-          name: orgId
-          required: true
-          schema:
-            type: string
-          description: the org ID
+        - $ref: '#/components/parameters/orgId'
       responses:
         '200':
           description: An array of contracts
@@ -646,14 +721,35 @@ paths:
                   $ref: '#/components/schemas/ContractItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - orgs
+      summary: creates a contract that is defined in the request body
+      operationId: createOrgContract
+      description: |
+        By reading the orgId, create a new contract
+      parameters:
+        - $ref: '#/components/parameters/orgId'
+      requestBody:
+        description: Contract item to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractItem'
+      responses:
+        '201':
+          description: 'contract created'
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 components:
   schemas:
     TimesheetDayItem:
       type: object
-      required:
-        - PK
-        - SK
-        - Date
       properties:
         PK:
           type: string
@@ -677,15 +773,12 @@ components:
         isHoliday:
           type: boolean
           example: false
-    TimesheetItem:
-      type: object
       required:
         - PK
         - SK
-        - startDate
-        - endDate
-        - status
-        - timesheetId
+        - Date
+    TimesheetItem:
+      type: object
       properties:
         PK:
           type: string
@@ -707,6 +800,13 @@ components:
         timesheetId:
           type: string
           example: '123456'
+      required:
+        - PK
+        - SK
+        - startDate
+        - endDate
+        - status
+        - timesheetId
     GroupDetails:
       type: object
       properties:
@@ -715,12 +815,6 @@ components:
           example: 'test'
     TaskItem:
       type: object
-      required:
-        - PK
-        - SK
-        - OrgId
-        - ParentId
-        - Details
       properties:
         PK:
           type: string
@@ -732,13 +826,14 @@ components:
           type: string
         Details:
           $ref: '#/components/schemas/GroupDetails'
-    ContractItem:
-      type: object
       required:
         - PK
         - SK
         - OrgId
+        - ParentId
         - Details
+    ContractItem:
+      type: object
       properties:
         PK:
           type: string
@@ -752,13 +847,13 @@ components:
             $ref: '#/components/schemas/TaskItem'
         Details:
           $ref: '#/components/schemas/GroupDetails'
-    OrgItem:
-      type: object
-      required: 
+      required:
         - PK
         - SK
         - OrgId
-        - Owner
+        - Details
+    OrgItem:
+      type: object
       properties:
         PK:
           type: string
@@ -772,12 +867,29 @@ components:
         Owner:
           type: string
           example: '123'
-    ProfileItem:
-      type: object
       required: 
         - PK
         - SK
         - OrgId
+        - Owner
+    UserInfoItem:
+      type: object
+      properties:
+        PK:
+          type: string
+          example: 'USER#123'
+        SK:
+          type: string
+          example: 'TIK_USER'
+        email:
+          type: string
+          example: 'ryalane2@gmail.com'
+      required:
+        - PK
+        - SK
+        - email
+    ProfileItem:
+      type: object
       properties:
         PK:
           type: string
@@ -791,12 +903,12 @@ components:
         GroupId:
           type: string
           example: '456#1'
-    UserItem:
-      type: object
-      required:
+      required: 
         - PK
         - SK
-        - email
+        - OrgId
+    UserItem:
+      type: object
       properties:
         PK:
           type: string
@@ -808,23 +920,83 @@ components:
           type: string
           format: email
           example: 'ryan.bowes@mgisinc.ca'
-    DayItem:
-      type: object
       required:
         - PK
         - SK
-        - Date
+        - email
+    DayItem:
+      type: object
       properties:
         PK:
           type: string
           example: 'USER#123'
         SK:
           type: string
-          example: 'TIK_DAYS_456#123_2022-01-30'
+          example: 'TIK_DAYS_456#1_2022-01-30'
+        ParentId:
+          type: string
+          example: '456#1'
         Date:
           type: string
           format: date
           example: '2022-08-15'
+      required:
+        - PK
+        - SK
+        - Date
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  parameters:
+    dayId:
+      name: dayId
+      in: path
+      description: the ID of the day
+      required: true
+      schema:
+        type: string
+    timesheetId:
+      in: path
+      name: timesheetId
+      required: true
+      schema:
+        type: string
+      description: the timesheet ID
+    taskId:
+      name: taskId
+      in: path
+      description: the task ID
+      required: true
+      schema:
+        type: string
+    contractId:
+      name: contractId
+      in: path
+      description: the contract ID
+      required: true
+      schema:
+        type: string
+    userId:
+      in: path
+      name: userId
+      required: true
+      schema:
+        type: string
+      description: the user ID
+    orgId:
+      in: path
+      name: orgId
+      required: true
+      schema:
+        type: string
+      description: the org ID
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
       type: http
@@ -833,9 +1005,15 @@ components:
   responses:
     UnauthorizedError:
       description: Authentication information is missing or invalid
-      headers:
-        WWW_Authenticate:
+      content:
+        application/json:
           schema:
-            type: string
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
 security:
   - bearerAuth: []
